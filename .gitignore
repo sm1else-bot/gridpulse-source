@@ -1,0 +1,11 @@
+data/raw/
+data/processed/
+models/
+.hadoop/
+.claude/
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+*.egg-info/
+.env
