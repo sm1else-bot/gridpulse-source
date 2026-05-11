@@ -430,7 +430,8 @@ with st.sidebar:
     st.markdown('<div class="gp-sidebar-label">Anomaly View</div>', unsafe_allow_html=True)
     anomaly_ba = st.selectbox(
         "BA for anomaly timeline",
-        options=selected_bas if selected_bas else all_bas[:1],
+        options=all_bas,
+        index=all_bas.index("CISO") if "CISO" in all_bas else 0,
         label_visibility="collapsed",
     )
 
@@ -457,7 +458,6 @@ if not data_ok:
         "solar_t6h_ahead":solar+rng.normal(0,5,n),"wind_t6h_ahead":wind+rng.normal(0,8,n),
     })
     anom_scores = np.abs(rng.normal(0,0.5,n))**2
-    anom_scores[(ts>="2021-02-10")&(ts<="2021-02-20")] *= 15
     anomaly_df = pd.DataFrame({"ba":"DEMO","ts":ts,"anomaly_score":anom_scores})
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -677,8 +677,7 @@ with m2:
             The model learns to reconstruct 168-hour (7-day) windows of five grid signals.
             At inference time, reconstruction mean squared error becomes the anomaly score:
             hours the model cannot reconstruct well are anomalous by definition. The 99th
-            percentile of training scores is used as the detection threshold. Notable flagged
-            events include the 2021 Texas winter freeze and the 2020 California rolling blackouts.
+            percentile of training scores is used as the detection threshold.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -784,15 +783,6 @@ fig2.add_trace(go.Scatter(
 fig2.add_hline(y=threshold, line_dash="dash", line_color="#ef4444", line_width=1.5,
     annotation_text=f"99th pct threshold ({threshold:.3f})",
     annotation_position="top right", annotation_font=dict(color="#ef4444", size=11))
-for ev_start, ev_end, color, label in [
-    ("2021-02-10","2021-02-20","rgba(239,68,68,0.08)","2021 TX Freeze"),
-    ("2020-08-14","2020-08-15","rgba(139,92,246,0.12)","2020 CA Blackout"),
-]:
-    ts_s = pd.Timestamp(ev_start, tz="UTC"); ts_e = pd.Timestamp(ev_end, tz="UTC")
-    if len(anom_ba_df) > 0 and ((anom_ba_df["ts"] >= ts_s) & (anom_ba_df["ts"] <= ts_e)).any():
-        fig2.add_vrect(x0=ts_s, x1=ts_e, fillcolor=color, layer="below", line_width=0,
-            annotation_text=label, annotation_position="top left",
-            annotation_font=dict(size=11, color="#374151"))
 fig2.update_layout(**PLOTLY_LAYOUT, height=280, xaxis_title="Time (UTC)",
     yaxis_title="Reconstruction MSE", showlegend=False)
 fig2.update_xaxes(showgrid=True, gridcolor="#f1f5f9", zeroline=False)

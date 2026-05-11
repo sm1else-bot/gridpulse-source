@@ -142,9 +142,7 @@ Features: 144 lag columns, 18 rolling-stat columns, calendar features, BA encodi
 
 A sequence-to-sequence LSTM autoencoder (hidden=128, latent=64) trained only on  
 "normal" (class-0) operational hours. Reconstruction MSE is the anomaly score;  
-the 99th-percentile threshold flags anomalous periods.  
-Notable flagged events: **2021 Texas winter freeze** (ERCO), **2020 California  
-rolling blackouts** (CISO).
+the 99th-percentile threshold flags anomalous periods.
 
 ### XGBoost Mismatch Severity Classifier
 
